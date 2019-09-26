@@ -1,0 +1,40 @@
+File organization map
+
+light curve data: 
+	/data/epyc/projects2/tess
+		/sector001
+		...
+		/sector014
+
+tess_binaries code:
+	/astro/users/jbirky/projects/tess_binaries
+		/catalogs
+			asassn_catalog.csv
+			kepler_eb_catalog.csv
+			simbad_sectors_1_15.csv
+			combined_sectors_1_15.csv
+		/code
+			/functions
+				__init__.py
+				data.py
+				period.py
+				plot.py
+			analysis.py
+		/results
+			/combined_sector_power_spectra
+				TIC_{}_ps.pkl
+			/plots
+				/asassn_ebs
+					TIC_{}.png
+		/notebooks
+		/models
+		/paper
+
+		.gitignore
+			/catalogs
+			/results
+
+
+Epyc directories:
+	export TESS_DATA="/data/epyc/projects2/tess"
+	export PYTHONPATH=$PYTHONPATH:"/astro/users/jbirky/projects/tess_binaries"
