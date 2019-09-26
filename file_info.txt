@@ -1,6 +1,6 @@
 File organization map
 
-light curve data: 
+lc_dir: light curve data
 	/data/epyc/projects2/tess
 		/sector001
 		...
@@ -8,19 +8,20 @@ light curve data:
 
 tess_binaries code:
 	/astro/users/jbirky/projects/tess_binaries
-		/catalogs
+		*/catalogs
 			asassn_catalog.csv
 			kepler_eb_catalog.csv
 			simbad_sectors_1_15.csv
 			combined_sectors_1_15.csv
 		/code
-			/functions
-				__init__.py
-				data.py
-				period.py
-				plot.py
 			analysis.py
-		/results
+			test.py
+		/tess_binaries
+			__init__.py
+			data.py
+			period.py
+			plot.py
+		*/results
 			/combined_sector_power_spectra
 				TIC_{}_ps.pkl
 			/plots
