@@ -29,6 +29,7 @@ plot_dir = '../results/plots'
 def plotTimeSeries(ps_dict, **kwargs):
 
     label = str(kwargs.get('label', 'Data'))
+    save_dir = kwargs.get('save_dir', plot_dir)
     
     #upack dictionary
     tic_id = str(ps_dict['tic_id'])
@@ -77,5 +78,5 @@ def plotTimeSeries(ps_dict, **kwargs):
     ax2.set_ylabel('Power (normalized)', fontsize=18)  
     ax2.minorticks_on()
     
-    plt.savefig(f'{plot_dir}/TIC_{tic_id}.png')
+    plt.savefig(f'{save_dir}/TIC_{tic_id}.png')
     plt.show() 

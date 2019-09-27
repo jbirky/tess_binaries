@@ -9,7 +9,8 @@ import pickle
 from astropy.timeseries import LombScargle
 
 from .data import readSourceFiles
-from .__init__ import lc_dir, ps_dir
+lc_dir   = os.environ['TESS_DATA']
+ps_dir   = '../results/combined_sector_power_spectra'
 
 
 def computePowerSpectra(tic_id, **kwargs):
@@ -19,9 +20,12 @@ def computePowerSpectra(tic_id, **kwargs):
     
     #Compute lomb-scargle power series
     ls0 = time.time()
-    freq, power = LombScargle(ts.time.jd, ts['pdcsap_flux'], dy=ts['pdcsap_flux_err']).autopower()
+    ls =  LombScargle(ts.time.jd, ts['pdcsap_flux'], dy=ts['pdcsap_flux_err'], \
+                          normalization='standard')
+    ls_freq, ls_power = ls.autopower(minimum_frequency=.001, \
+                          maximum_frequency=100, samples_per_peak=10)
     ls_time = time.time() - ls0
-    ls_pwr_spec  = np.vstack([np.array(1/freq), np.array(power/max(power))])
+    ls_pwr_spec  = np.vstack([np.array(1/ls_freq), np.array(ls_power)])
     print(f'Lomb-Scargle compute time: {ls_time}')
     
     #find best lomb-scargle period
