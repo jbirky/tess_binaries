@@ -1,6 +1,6 @@
 from .data import readSourceFiles
 from .period import computePowerSpectra
-from .plot import plotTimeSeries
+from .plot import plotTimeSeries, plotLightCurve
 
 import os
 
