@@ -18,7 +18,12 @@ ps_dir = '../results/combined_sector_power_spectra'
 def readSourceFiles(tic_id, **kwargs):
     
     tic_id = str(tic_id)
-    files = glob.glob(f'{lc_dir}/sector*/*{tic_id}*.fits')
+    
+    if 'sector' in kwargs:
+        sec = str(kwargs.get('sector')).rjust(3, '0')
+        files = glob.glob(f'{lc_dir}/sector{sec}/*{tic_id}*.fits')
+    else:
+        files = glob.glob(f'{lc_dir}/sector*/*{tic_id}*.fits')
 
     data_frames = []
     end_times = []
