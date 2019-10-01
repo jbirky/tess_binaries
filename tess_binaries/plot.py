@@ -27,14 +27,39 @@ ps_dir = '../results/combined_sector_power_spectra'
 plot_dir = '../results/plots'
 
 
-def plotLightCurve(tic_id, **kwargs):
+def plotLightCurveSector(data, **kwargs):
 
+    label = str(kwargs.get('label', 'Data'))
+    
+    plt.figure(figsize=[16,8])
+    plt.ticklabel_format(useOffset=False)
+    plt.plot(data.time.jd, data['pdcsap_flux']/np.nanmedian(data['pdcsap_flux']), \
+             color='k', linewidth=.5, label=f'{label}'.replace('_', ' '))
+
+    plt.ylabel('PDCSAP Flux', fontsize=18)
+    plt.xlabel('Julian Date', fontsize=18)
+    plt.xlim(min(data.time.jd), max(data.time.jd))
+    plt.legend(loc='upper right', frameon=False, fontsize=16)
+    plt.minorticks_on()
+    
+    if 'save_dir' in kwargs:
+        save_dir = kwargs.get('save_dir')
+        tic_id = kwargs.get('tic_id')
+        plt.savefig(f'{save_dir}/TIC_{tic_id}.png')
+    plt.show() 
+    
+
+def plotLightCurveFull(tic_id, **kwargs):
+
+    label = str(kwargs.get('label', 'Data'))
+    
     tic_id = str(tic_id)
     data, end_times = readSourceFiles(tic_id)
     
     plt.figure(figsize=[16,8])
     plt.ticklabel_format(useOffset=False)
-    plt.plot(data.time.jd, data['pdcsap_flux']/np.nanmedian(data['pdcsap_flux']), color='k', linewidth=.5)
+    plt.plot(data.time.jd, data['pdcsap_flux']/np.nanmedian(data['pdcsap_flux']), \
+             color='k', linewidth=.5, label=f'{label}'.replace('_', ' '))
     
     if len(end_times) > 1:
         for t in end_times:
