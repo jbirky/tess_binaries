@@ -1,6 +1,7 @@
 from .data import readSourceFiles
-from .period import computePowerSpectra
+from .period import computePowerSpectra, binData
 from .plot import plotTimeSeries, plotLightCurveFull, plotLightCurveSector
+#from .dtw import 
 
 import os
 

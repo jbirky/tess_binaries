@@ -6,6 +6,7 @@ import glob
 import time
 import pickle
 
+from astropy import units as u
 from astropy.timeseries import LombScargle
 
 from .data import readSourceFiles
@@ -43,3 +44,16 @@ def computePowerSpectra(tic_id, **kwargs):
     pickle.dump(ps_output, output)
     
     return ps_output
+
+
+def binData(data, tsteps):
+    
+    tbins = np.linspace(min(data.time.jd), max(data.time.jd), tsteps+1)
+    bin_width = (tbins[1] - tbins[0])/2
+    bin_flux = []
+    for i in range(tsteps):
+        bin_ind = np.where((data.time.jd > tbins[i]) & (data.time.jd < tbins[i+1]))[0]
+        bin_flux.append(np.nanmedian(data['pdcsap_flux'][bin_ind])/u.electron*u.second)
+    bin_flux = np.array(bin_flux)/np.median(np.array(bin_flux))
+    
+    return bin_flux
