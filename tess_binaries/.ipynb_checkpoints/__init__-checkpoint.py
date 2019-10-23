@@ -1,6 +1,7 @@
-from .data import readSourceFiles
-from .period import computePowerSpectra
-from .plot import plotTimeSeries
+from .data import *
+from .period import *
+from .plot import *
+from .dtw import *
 
 import os
 

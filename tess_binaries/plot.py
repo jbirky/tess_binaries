@@ -26,6 +26,7 @@ lc_dir = os.environ['TESS_DATA']
 ps_dir = '../results/combined_sector_power_spectra'
 plot_dir = '../results/plots'
 
+__all__ = ['plotLightCurveSector', 'plotLightCurveFull']
 
 def plotLightCurveSector(data, **kwargs):
 

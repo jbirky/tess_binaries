@@ -21,14 +21,68 @@ from astropy.io import fits, ascii
 from astropy.table import Table, vstack
 from astropy.timeseries import aggregate_downsample
 
+from .data import readSourceFiles
 lc_dir = os.environ['TESS_DATA']
 ps_dir = '../results/combined_sector_power_spectra'
 plot_dir = '../results/plots'
 
+__all__ = ['plotLightCurveSector', 'plotLightCurveFull']
 
+def plotLightCurveSector(data, **kwargs):
+
+    label = str(kwargs.get('label', 'Data'))
+    
+    plt.figure(figsize=[16,8])
+    plt.ticklabel_format(useOffset=False)
+    plt.plot(data.time.jd, data['pdcsap_flux']/np.nanmedian(data['pdcsap_flux']), \
+             color='k', linewidth=.5, label=f'{label}'.replace('_', ' '))
+
+    plt.ylabel('PDCSAP Flux', fontsize=18)
+    plt.xlabel('Julian Date', fontsize=18)
+    plt.xlim(min(data.time.jd), max(data.time.jd))
+    plt.legend(loc='upper right', frameon=False, fontsize=16)
+    plt.minorticks_on()
+    
+    if 'save_dir' in kwargs:
+        save_dir = kwargs.get('save_dir')
+        tic_id = kwargs.get('tic_id')
+        plt.savefig(f'{save_dir}/TIC_{tic_id}.png')
+    plt.show() 
+    
+
+def plotLightCurveFull(tic_id, **kwargs):
+
+    label = str(kwargs.get('label', 'Data'))
+    
+    tic_id = str(tic_id)
+    data, end_times = readSourceFiles(tic_id)
+    
+    plt.figure(figsize=[16,8])
+    plt.ticklabel_format(useOffset=False)
+    plt.plot(data.time.jd, data['pdcsap_flux']/np.nanmedian(data['pdcsap_flux']), \
+             color='k', linewidth=.5, label=f'{label}'.replace('_', ' '))
+    
+    if len(end_times) > 1:
+        for t in end_times:
+            plt.axvline(x=t, color='r', alpha=.5)
+    
+    plt.title('TIC' + tic_id, fontsize=25)
+    plt.ylabel('PDCSAP Flux', fontsize=18)
+    plt.xlabel('Julian Date', fontsize=18)
+    plt.xlim(min(data.time.jd), max(data.time.jd))
+    plt.legend(loc='upper right', frameon=False, fontsize=16)
+    plt.minorticks_on()
+    
+    if 'save_dir' in kwargs:
+        save_dir = kwargs.get('save_dir')
+        plt.savefig(f'{save_dir}/TIC_{tic_id}.png')
+    plt.show() 
+    
+    
 def plotTimeSeries(ps_dict, **kwargs):
 
     label = str(kwargs.get('label', 'Data'))
+    save_dir = kwargs.get('save_dir', plot_dir)
     
     #upack dictionary
     tic_id = str(ps_dict['tic_id'])
@@ -77,5 +131,5 @@ def plotTimeSeries(ps_dict, **kwargs):
     ax2.set_ylabel('Power (normalized)', fontsize=18)  
     ax2.minorticks_on()
     
-    plt.savefig(f'{plot_dir}/TIC_{tic_id}.png')
+    plt.savefig(f'{save_dir}/TIC_{tic_id}.png')
     plt.show() 

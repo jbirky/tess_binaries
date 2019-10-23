@@ -13,6 +13,7 @@ from .data import readSourceFiles
 lc_dir   = os.environ['TESS_DATA']
 ps_dir   = '../results/combined_sector_power_spectra'
 
+__all__ = ['computePowerSpectra', 'binData']
 
 def computePowerSpectra(tic_id, **kwargs):
 

@@ -6,11 +6,14 @@ import glob
 import time
 import pickle
 
+from astropy import units as u
 from astropy.timeseries import LombScargle
 
 from .data import readSourceFiles
-from .__init__ import lc_dir, ps_dir
+lc_dir   = os.environ['TESS_DATA']
+ps_dir   = '../results/combined_sector_power_spectra'
 
+__all__ = ['computePowerSpectra', 'binData']
 
 def computePowerSpectra(tic_id, **kwargs):
 
@@ -19,9 +22,12 @@ def computePowerSpectra(tic_id, **kwargs):
     
     #Compute lomb-scargle power series
     ls0 = time.time()
-    freq, power = LombScargle(ts.time.jd, ts['pdcsap_flux'], dy=ts['pdcsap_flux_err']).autopower()
+    ls =  LombScargle(ts.time.jd, ts['pdcsap_flux'], dy=ts['pdcsap_flux_err'], \
+                          normalization='standard')
+    ls_freq, ls_power = ls.autopower(minimum_frequency=.001, \
+                          maximum_frequency=100, samples_per_peak=10)
     ls_time = time.time() - ls0
-    ls_pwr_spec  = np.vstack([np.array(1/freq), np.array(power/max(power))])
+    ls_pwr_spec  = np.vstack([np.array(1/ls_freq), np.array(ls_power)])
     print(f'Lomb-Scargle compute time: {ls_time}')
     
     #find best lomb-scargle period
@@ -39,3 +45,16 @@ def computePowerSpectra(tic_id, **kwargs):
     pickle.dump(ps_output, output)
     
     return ps_output
+
+
+def binData(data, tsteps):
+    
+    tbins = np.linspace(min(data.time.jd), max(data.time.jd), tsteps+1)
+    bin_width = (tbins[1] - tbins[0])/2
+    bin_flux = []
+    for i in range(tsteps):
+        bin_ind = np.where((data.time.jd > tbins[i]) & (data.time.jd < tbins[i+1]))[0]
+        bin_flux.append(np.nanmedian(data['pdcsap_flux'][bin_ind])/u.electron*u.second)
+    bin_flux = np.array(bin_flux)/np.median(np.array(bin_flux))
+    
+    return bin_flux
