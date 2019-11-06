@@ -17,12 +17,16 @@ rc('ytick', labelsize=20)
 __all__ = ['preprocessData', 'plotDTW']
 from tess_binaries import binData
 
-def preprocessData(dataframe, period, tsteps=100, scale=True):
+def preprocessData(dataframe, period, tsteps=100, fold=True, scale=True):
     
     pharr = np.linspace(0,1,tsteps)
     
-    phase_fold_df = dataframe.fold(period=period*u.day)
-    binned_flux = binData(phase_fold_df, tsteps)
+    if fold == True:
+        phase_fold_df = dataframe.fold(period=period*u.day)
+        binned_flux = binData(phase_fold_df, tsteps)
+    else:
+        binned_flux = np.array(dataframe['pdcsap_flux'])
+        
     shift_flux = np.roll(np.array(binned_flux), tsteps-np.argmin(binned_flux))
 
     if scale == True:

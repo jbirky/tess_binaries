@@ -55,6 +55,6 @@ def binData(data, tsteps):
     for i in range(tsteps):
         bin_ind = np.where((data.time.jd > tbins[i]) & (data.time.jd < tbins[i+1]))[0]
         bin_flux.append(np.nanmedian(data['pdcsap_flux'][bin_ind])/u.electron*u.second)
-    bin_flux = np.array(bin_flux)/np.median(np.array(bin_flux))
+    bin_flux = np.array(bin_flux)/np.nanmedian(np.array(bin_flux))
     
     return bin_flux
