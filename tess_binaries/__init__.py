@@ -1,4 +1,4 @@
-from .data import *
+from .read import *
 from .period import *
 from .plot import *
 from .dtw import *
