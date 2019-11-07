@@ -21,12 +21,10 @@ from astropy.io import fits, ascii
 from astropy.table import Table, vstack
 from astropy.timeseries import aggregate_downsample
 
-from .data import readSourceFiles
-lc_dir = os.environ['TESS_DATA']
-ps_dir = '../results/combined_sector_power_spectra'
-plot_dir = '../results/plots'
+import tess_binaries as tb
 
 __all__ = ['plotLightCurveSector', 'plotLightCurveFull']
+
 
 def plotLightCurveSector(data, **kwargs):
 
@@ -55,7 +53,7 @@ def plotLightCurveFull(tic_id, **kwargs):
     label = str(kwargs.get('label', 'Data'))
     
     tic_id = str(tic_id)
-    data, end_times = readSourceFiles(tic_id)
+    data, end_times = tb.readSourceFiles(tic_id)
     
     plt.figure(figsize=[16,8])
     plt.ticklabel_format(useOffset=False)
@@ -82,7 +80,7 @@ def plotLightCurveFull(tic_id, **kwargs):
 def plotTimeSeries(ps_dict, **kwargs):
 
     label = str(kwargs.get('label', 'Data'))
-    save_dir = kwargs.get('save_dir', plot_dir)
+    save_dir = kwargs.get('save_dir', tb.plot_dir)
     
     #upack dictionary
     tic_id = str(ps_dict['tic_id'])

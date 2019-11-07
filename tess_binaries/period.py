@@ -9,15 +9,14 @@ import pickle
 from astropy import units as u
 from astropy.timeseries import LombScargle
 
-from .data import readSourceFiles
-lc_dir   = os.environ['TESS_DATA']
-ps_dir   = '../results/combined_sector_power_spectra'
+import tess_binaries as tb
 
 __all__ = ['computePowerSpectra', 'binData']
 
+
 def computePowerSpectra(tic_id, **kwargs):
 
-    data, end_times = readSourceFiles(tic_id)
+    data, end_times = tb.readSourceFiles(tic_id)
     ts = data[~np.isnan(data['pdcsap_flux'])]
     
     #Compute lomb-scargle power series
@@ -38,9 +37,9 @@ def computePowerSpectra(tic_id, **kwargs):
                  'ls_best_period': ls_best_period, 'bls_best_period': None, \
                  'ls_time': ls_time, 'bls_time': None, 'end_times': end_times}
     
-    fname = f'{ps_dir}/{tic_id}_ps.pkl'
+    fname = f'{tb.ps_dir}/{tic_id}_ps.pkl'
     
-    print(f'Saving power spectra to {ps_dir}.')
+    print(f'Saving power spectra to {tb.ps_dir}.')
     output = open(fname, 'wb')
     pickle.dump(ps_output, output)
     

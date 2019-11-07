@@ -1,20 +1,14 @@
 import numpy as np
-import pandas as pd
-import math
-import os
 import glob
-import time
-import pickle
 
 from astropy import units as u
-from astropy.io import fits, ascii
 from astropy.table import Table, vstack
 from astropy.timeseries import TimeSeries
 
-lc_dir = os.environ['TESS_DATA']
-ps_dir = '../results/combined_sector_power_spectra'
+import tess_binaries as tb
 
-__all__ = ['readSourceFiles']        
+__all__ = ['readSourceFiles']     
+   
         
 def readSourceFiles(tic_id, **kwargs):
     
@@ -22,9 +16,9 @@ def readSourceFiles(tic_id, **kwargs):
     
     if 'sector' in kwargs:
         sec = str(kwargs.get('sector')).rjust(3, '0')
-        files = glob.glob(f'{lc_dir}/sector{sec}/*{tic_id}*.fits')
+        files = glob.glob(f'{tb.lc_dir}/sector{sec}/*{tic_id}*.fits')
     else:
-        files = glob.glob(f'{lc_dir}/sector*/*{tic_id}*.fits')
+        files = glob.glob(f'{tb.lc_dir}/sector*/*{tic_id}*.fits')
 
     data_frames = []
     end_times = []

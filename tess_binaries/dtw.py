@@ -14,8 +14,10 @@ rc('figure', facecolor='w')
 rc('xtick', labelsize=20)
 rc('ytick', labelsize=20)
 
+import tess_binaries as tb
+
 __all__ = ['preprocessData', 'plotDTW']
-from tess_binaries import binData
+
 
 def preprocessData(dataframe, period, tsteps=100, fold=True, scale=True):
     
@@ -23,7 +25,7 @@ def preprocessData(dataframe, period, tsteps=100, fold=True, scale=True):
     
     if fold == True:
         phase_fold_df = dataframe.fold(period=period*u.day)
-        binned_flux = binData(phase_fold_df, tsteps)
+        binned_flux = tb.binData(phase_fold_df, tsteps)
     else:
         binned_flux = np.array(dataframe['pdcsap_flux'])
         
