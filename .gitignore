@@ -1,2 +1,6 @@
 catalogs/
 results/
+*/.ipynb_checkpoints
+*.txt
+*.png
+*/__pycache__
