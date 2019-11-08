@@ -16,32 +16,7 @@ rc('figure', facecolor='w')
 rc('xtick', labelsize=20)
 rc('ytick', labelsize=20)
 
-from tess_binaries import *
-
-def loadSampleFromHDF5(fname)
-    ff = h5py.File(fname, mode="r")
-
-    df = {}
-    for key in list(ff):
-        try:
-            df[key] = ff[key].value
-        except:
-            df[key] = np.array(ff[key].value, dtype='str')
-
-    ff.close()
-    sample = pd.DataFrame(data=df)
-    
-    return sample
-
-
-def loadPickle(ID):
-    ls_period, bls_period = [], []
-
-    infile = open(f'{tb.ps_dir}/{ID}_ps.pkl','rb')
-    ps_dict = pickle.load(infile)
-    infile.close()
-    
-    return ps_dict['ls_best_period']
+import tess_binaries as tb
 
 
 if __name__ == "__main__":
