@@ -9,7 +9,7 @@ class LightCurve():
 	"""
 	def __init__(self, *args, **kwargs):
 
-		self.tic_id 	= kwargs.get('tic_id')		# TESS input catalog ID
+		self.tic_id = kwargs.get('tic_id')			# TESS input catalog ID
 
 		if ('time' in kwargs) and ('flux' in kwargs):
 			self.time 		= kwargs.get('time')		
@@ -22,7 +22,14 @@ class LightCurve():
 			self.flux 		= lc[1]					# PDCSAP flux
 			self.flux_err 	= lc[2]					# PDCSAP flux error
 
-	def phaseFold():
+	def phaseFold(period):
+
+		self.period = period
+
+		lc_t0 = min(self.time)
+		lc_tm = max(self.time)
+
+		fold_flux = None
 
 		return fold_flux
 
