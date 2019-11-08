@@ -43,7 +43,7 @@ def computePowerSpectra(tic_id, **kwargs):
         # Save power spectrum to numpy file
         ls_fname = f'{load_dir}/{tic_id}_ps_ls.pkl'
         print(f'Saving power spectra to {ls_fname}.')
-        np.save(ls_pwr_spec, ls_fname)
+        np.save(ls_fname, ls_pwr_spec)
 
         power_spectra.append(ls_pwr_spec)
     
@@ -67,7 +67,7 @@ def computePowerSpectra(tic_id, **kwargs):
         # Save power spectrum to numpy file
         bls_fname = f'{load_dir}/{tic_id}_ps_bls.pkl'
         print(f'Saving power spectra to {bls_fname}.')
-        np.save(bls_pwr_spec, bls_fname)
+        np.save(bls_fname, bls_pwr_spec)
 
         power_spectra.append(bls_pwr_spec)
     
