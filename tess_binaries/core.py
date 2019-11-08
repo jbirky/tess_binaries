@@ -9,19 +9,21 @@ class LightCurve():
 	"""
 	def __init__(self, *args, **kwargs):
 
-		self.tic_id = kwargs.get('tic_id')		# TESS input catalog ID
-		self.time = kwargs.get('time')			# time in MJD
-		self.flux = kwargs.get('flux')			# PDCSAP flux
-		self.flux_err = kwargs.get('flux_err')	# PDCSAP flux error
+		self.tic_id 	= kwargs.get('tic_id')		# TESS input catalog ID
 
-	def loadLC():
-		data, end_times = tb.readSourceFiles(self.tic_id)
+		if ('time' in kwargs) and ('flux' in kwargs):
+			self.time 		= kwargs.get('time')		
+			self.flux 		= kwargs.get('flux')		
+			self.flux_err 	= kwargs.get('flux_err')	
 
-		self.time = np.array(data.time.jd)
-		self.flux = np.array(data['pdcsap_flux'])
-		self.flux_err = np.array(data['pdcsap_flux_err'])
+		else:
+			lc = tb.loadLightCurve(self.tic_id)
+			self.time 		= lc[0]					# time in MJD
+			self.flux 		= lc[1]					# PDCSAP flux
+			self.flux_err 	= lc[2]					# PDCSAP flux error
 
 	def phaseFold():
+
 		return fold_flux
 
 
