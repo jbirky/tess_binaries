@@ -9,16 +9,20 @@ import tess_binaries as tb
 
 __all__ = ['readSourceFiles']     
 
-        
+   
+# =======================================================================
+# Read raw individual source files
+# =======================================================================
+
 def readSourceFiles(tic_id, **kwargs):
     
     tic_id = str(tic_id)
     
     if 'sector' in kwargs:
         sec = str(kwargs.get('sector')).rjust(3, '0')
-        files = glob.glob(f'{tb.lc_dir}/sector{sec}/*{tic_id}*.fits')
+        files = glob.glob(f'{tb.data_dir}/sector{sec}/*{tic_id}*.fits')
     else:
-        files = glob.glob(f'{tb.lc_dir}/sector*/*{tic_id}*.fits')
+        files = glob.glob(f'{tb.data_dir}/sector*/*{tic_id}*.fits')
 
     data_frames = []
     end_times = []
@@ -50,20 +54,12 @@ def readSourceFiles(tic_id, **kwargs):
     return data, end_times
 
 
-def loadSampleFromHDF5(fname)
-    ff = h5py.File(fname, mode="r")
+# =======================================================================
+# Read saved individual files
+# =======================================================================
 
-    df = {}
-    for key in list(ff):
-        try:
-            df[key] = ff[key].value
-        except:
-            df[key] = np.array(ff[key].value, dtype='str')
-
-    ff.close()
-    sample = pd.DataFrame(data=df)
-    
-    return sample
+def loadSourceFiles(tic_id, **kwargs):
+    return None
 
 
 def loadPickle(ID):
@@ -79,3 +75,23 @@ def loadPickle(ID):
 def loadPowerSpectrum(tic_id, **kwargs):
     
     return None
+
+
+# =======================================================================
+# Read saved sample files
+# =======================================================================
+
+def loadSampleFromHDF5(fname)
+    ff = h5py.File(fname, mode="r")
+
+    df = {}
+    for key in list(ff):
+        try:
+            df[key] = ff[key].value
+        except:
+            df[key] = np.array(ff[key].value, dtype='str')
+
+    ff.close()
+    sample = pd.DataFrame(data=df)
+    
+    return sample
