@@ -7,22 +7,25 @@ from astropy.timeseries import TimeSeries
 
 import tess_binaries as tb
 
-__all__ = ['readSourceFiles']     
+__all__ = ['loadSourceFromFits', 'loadLightCurve']     
 
    
 # =======================================================================
 # Read raw individual source files
 # =======================================================================
 
-def readSourceFiles(tic_id, **kwargs):
-    
+def loadSourceFromFits(tic_id, **kwargs):
+    """
+    Load combined sector light curve from TESS fits files
+    """
+    load_dir = kwargs.get('load_dir', tb.data_dir)
     tic_id = str(tic_id)
     
     if 'sector' in kwargs:
         sec = str(kwargs.get('sector')).rjust(3, '0')
-        files = glob.glob(f'{tb.data_dir}/sector{sec}/*{tic_id}*.fits')
+        files = glob.glob(f'{load_dir}/sector{sec}/*{tic_id}*.fits')
     else:
-        files = glob.glob(f'{tb.data_dir}/sector*/*{tic_id}*.fits')
+        files = glob.glob(f'{load_dir}/sector*/*{tic_id}*.fits')
 
     data_frames = []
     end_times = []
@@ -58,18 +61,26 @@ def readSourceFiles(tic_id, **kwargs):
 # Read saved individual files
 # =======================================================================
 
-def loadSourceFiles(tic_id, **kwargs):
-    return None
+def loadLightCurve(tic_id, **kwargs):
+    """
+    Load combined sector light curve from numpy array containing [time, flux, flux_err]
+    """
+    load_dir = kwargs.get('load_dir', tb.lc_dir)
+    tic_id = str(tic_id)
 
+    try:
+        lc = np.load(f'TIC_{tic_id}_ls.npy')
 
-def loadPickle(ID):
-    ls_period, bls_period = [], []
+    except:
+        print('Loading from FITS files...')
+        data, = loadSourceFromFits(tic_id, load_dir=tb.data_dir)
+        time = np.array(data.time.jd)
+        flux = np.array(data['pdcsap_flux'])
+        flux_err = np.array(data['pdcsap_flux_err'])
 
-    infile = open(f'{tb.ps_dir}/{ID}_ps.pkl','rb')
-    ps_dict = pickle.load(infile)
-    infile.close()
-    
-    return ps_dict['ls_best_period']
+        lc = np.vstack([time, flux, flux_err])
+
+    return lc
 
 
 def loadPowerSpectrum(tic_id, **kwargs):
@@ -81,7 +92,7 @@ def loadPowerSpectrum(tic_id, **kwargs):
 # Read saved sample files
 # =======================================================================
 
-def loadSampleFromHDF5(fname)
+def loadSampleFromHDF5(fname):
     ff = h5py.File(fname, mode="r")
 
     df = {}
