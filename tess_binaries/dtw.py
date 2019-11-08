@@ -41,6 +41,7 @@ def preprocessData(dataframe, period, tsteps=100, fold=True, scale=True):
     
     else:
         return shift_flux
+        
 
 def plotDTW(flux1, flux2, **kwargs):
     

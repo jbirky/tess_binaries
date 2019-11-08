@@ -16,7 +16,7 @@ __all__ = ['computePowerSpectra', 'binData']
 
 def computePowerSpectra(tic_id, **kwargs):
 
-    data, end_times = tb.readSourceFiles(tic_id)
+    data, end_times = tb.loadSourceFromFits(tic_id)
     ts = data[~np.isnan(data['pdcsap_flux'])]
     
     #Compute lomb-scargle power series

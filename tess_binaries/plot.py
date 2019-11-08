@@ -53,7 +53,7 @@ def plotLightCurveFull(tic_id, **kwargs):
     label = str(kwargs.get('label', 'Data'))
     
     tic_id = str(tic_id)
-    data, end_times = tb.readSourceFiles(tic_id)
+    data, end_times = tb.loadSourceFromFits(tic_id)
     
     plt.figure(figsize=[16,8])
     plt.ticklabel_format(useOffset=False)
