@@ -1,6 +1,6 @@
 File organization map
 
-lc_dir: light curve data
+data_dir: light curve data
 	/data/epyc/projects2/tess
 		/sector001
 		...
@@ -24,6 +24,11 @@ tess_binaries code:
 		*/results
 			/combined_sector_power_spectra
 				TIC_{}_ps.pkl
+			/power_spectra
+				TIC_{}_ps_ls.pkl
+				TIC_{}_ps_bls.pkl
+			/light_curves
+				TIC_{}_lc.pkl
 			/plots
 				/asassn_ebs
 					TIC_{}.png
