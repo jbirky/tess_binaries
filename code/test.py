@@ -1,10 +1,5 @@
 import numpy as np
 import pandas as pd
-import math
-import os
-import glob
-import time
-import pickle
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
@@ -20,5 +15,5 @@ import tess_binaries as tb
 
 
 if __name__ == "__main__":
-	sample = loadSampleFromHDF5(f'{tb.cat_dir}/asassn_tess_inspected.hdf5')
+	lc = tb.loadLightCurve(tic_id='30317282')
     

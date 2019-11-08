@@ -1,5 +1,6 @@
 import numpy as np
 import glob
+import warnings
 
 from astropy import units as u
 from astropy.table import Table, vstack
@@ -32,7 +33,9 @@ def loadSourceFromFits(tic_id, **kwargs):
 
     try:
         for file in files:
-            fcontents = TimeSeries.read(file, format='tess.fits')
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")             #suppress astropy warnings
+                fcontents = TimeSeries.read(file, format='tess.fits')
             
             #normalize flux
             pdcsap_flux = fcontents['pdcsap_flux']
@@ -46,7 +49,9 @@ def loadSourceFromFits(tic_id, **kwargs):
     except:
         raise Exception(f'{tic_id} not downloaded.')
 
-    data = vstack(data_frames) 
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")             #suppress astropy warnings
+        data = vstack(data_frames) 
     
     #un-normalize flux
     unit_flux = data['pdcsap_flux_norm'] * np.nanmedian(data['pdcsap_flux'])
@@ -69,7 +74,7 @@ def loadLightCurve(tic_id, **kwargs):
     tic_id = str(tic_id)
 
     try:
-        lc = np.load(f'TIC_{tic_id}_ls.npy')
+        lc = np.load(f'{load_dir}/{tic_id}_lc.npy')
 
     except:
         print('Loading from FITS files...')
@@ -79,6 +84,7 @@ def loadLightCurve(tic_id, **kwargs):
         flux_err = np.array(data['pdcsap_flux_err'])
 
         lc = np.vstack([time, flux, flux_err])
+        np.save(f'{load_dir}/{tic_id}_lc.npy', lc)
 
     return lc
 
