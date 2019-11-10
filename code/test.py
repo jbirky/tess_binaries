@@ -17,16 +17,7 @@ import tess_binaries as tb
 
 
 if __name__ == "__main__":
-    ff = h5py.File(f'{tb.cat_dir}/asassn_tess_inspected.hdf5', mode="r")
-
-    df = {}
-    for key in list(ff):
-        if key == 'type':
-            df[key] = np.array(ff[key].value, dtype='str')
-        else:
-            df[key] = ff[key].value
-
-    ff.close()
-    sample = pd.DataFrame(data=df)
+    
+    sample = tb.loadSampleFromHDF5(f'{tb.cat_dir}/asassn_tess_inspected.hdf5')
 
     tb.sampleLoadLightCurves(list(sample['tic_id']))

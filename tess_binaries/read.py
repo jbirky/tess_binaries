@@ -8,7 +8,7 @@ from astropy.timeseries import TimeSeries
 
 import tess_binaries as tb
 
-__all__ = ['loadSourceFromFits', 'loadLightCurve']     
+__all__ = ['loadSourceFromFits', 'loadLightCurve', 'loadSampleFromHDF5']     
 
    
 # =======================================================================
