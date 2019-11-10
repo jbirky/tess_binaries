@@ -70,7 +70,7 @@ def loadSourceFromFits(tic_id, **kwargs):
 
 def loadLightCurve(tic_id, **kwargs):
     """
-    Load combined sector light curve from numpy array containing [time, flux, flux_err]
+    Load combined sector light curve from numpy array containing [mjd, flux, flux_err]
     """
     load_dir = kwargs.get('load_dir', tb.lc_dir)
     tic_id = str(tic_id)
@@ -81,11 +81,11 @@ def loadLightCurve(tic_id, **kwargs):
     except:
         print('Loading from FITS files...')
         data, end_times = loadSourceFromFits(tic_id, load_dir=tb.data_dir)
-        time = np.array(data.time.jd)
+        mjd = np.array(data.time.jd)
         flux = np.array(data['pdcsap_flux'])
         flux_err = np.array(data['pdcsap_flux_err'])
 
-        lc = np.vstack([time, flux, flux_err])
+        lc = np.vstack([mjd, flux, flux_err])
         np.save(f'{load_dir}/{tic_id}_lc.npy', lc)
 
     return lc
