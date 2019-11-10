@@ -41,7 +41,7 @@ def computePowerSpectra(tic_id, **kwargs):
         ls_best_period = ls_pwr_spec[0][ls_max_pwr]
 
         # Save power spectrum to numpy file
-        ls_fname = f'{load_dir}/{tic_id}_ps_ls.pkl'
+        ls_fname = f'{load_dir}/{tic_id}_ps_ls.npy'
         print(f'Saving power spectra to {ls_fname}.')
         np.save(ls_fname, ls_pwr_spec)
 
@@ -65,7 +65,7 @@ def computePowerSpectra(tic_id, **kwargs):
         bls_best_period = bls_pwr_spec[0][bls_max_pwr]
 
         # Save power spectrum to numpy file
-        bls_fname = f'{load_dir}/{tic_id}_ps_bls.pkl'
+        bls_fname = f'{load_dir}/{tic_id}_ps_bls.npy'
         print(f'Saving power spectra to {bls_fname}.')
         np.save(bls_fname, bls_pwr_spec)
 
