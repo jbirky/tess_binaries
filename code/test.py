@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import h5py
+import time
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
@@ -15,5 +17,16 @@ import tess_binaries as tb
 
 
 if __name__ == "__main__":
-	lc = tb.loadLightCurve(tic_id='30317282')
-    
+    ff = h5py.File(f'{tb.cat_dir}/asassn_tess_inspected.hdf5', mode="r")
+
+    df = {}
+    for key in list(ff):
+        if key == 'type':
+            df[key] = np.array(ff[key].value, dtype='str')
+        else:
+            df[key] = ff[key].value
+
+    ff.close()
+    sample = pd.DataFrame(data=df)
+
+    tb.sampleLoadLightCurves(list(sample['tic_id']))
