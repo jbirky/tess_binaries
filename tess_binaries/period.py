@@ -7,7 +7,7 @@ import time
 import pickle
 
 from astropy import units as u
-from astropy.timeseries import LombScargle
+from astropy.timeseries import BoxLeastSquares, LombScargle
 
 import tess_binaries as tb
 
@@ -19,8 +19,8 @@ def computePowerSpectra(tic_id, **kwargs):
     load_dir = kwargs.get('load_dir', tb.ps_dir)
     methods  = kwargs.get('methods', ['ls', 'bls'])
 
-    time, flux, flux_err = tb.loadLightCurve(tic_id)
-    data = pd.DataFrame(data={'time':time, 'flux':flux, 'flux_err':flux_err})
+    mjd, flux, flux_err = tb.loadLightCurve(tic_id)
+    data = pd.DataFrame(data={'time':mjd, 'flux':flux, 'flux_err':flux_err})
     ts = data[~np.isnan(data['flux'])]
     
     power_spectra = []
