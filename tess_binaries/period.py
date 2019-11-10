@@ -17,7 +17,7 @@ __all__ = ['computePowerSpectra', 'binData']
 def computePowerSpectra(tic_id, **kwargs):
     
     load_dir = kwargs.get('load_dir', tb.ps_dir)
-    methods  = kwargs.get('methods', ['ls', 'bls'])
+    methods  = kwargs.get('methods', ['ls'])
 
     mjd, flux, flux_err = tb.loadLightCurve(tic_id)
     data = pd.DataFrame(data={'time':mjd, 'flux':flux, 'flux_err':flux_err})
@@ -47,11 +47,11 @@ def computePowerSpectra(tic_id, **kwargs):
 
         power_spectra.append(ls_pwr_spec)
     
-    if 'bls' in methods:
+    if 'bls' in methods: # NOT WORKING
         # Compute box-least-squares power series
         bls0 = time.time()
         psamp = 10**3
-        rng = [ls_best_period/4, ls_best_period*5]          # center BLS grid around LS best period
+        rng = [ls_best_period/5, ls_best_period*5]          # center BLS grid around LS best period
         model = BoxLeastSquares(ts['time'] * u.day, ts['flux'], dy=ts['flux_err'])
         periods = np.linspace(rng[0], rng[1], psamp) * u.day
         periodogram = model.power(periods, rng[0]/2)
