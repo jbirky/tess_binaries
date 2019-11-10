@@ -1,5 +1,7 @@
 import numpy as np
+import pandas as pd
 import glob
+import h5py
 import warnings
 
 from astropy import units as u
@@ -99,6 +101,7 @@ def loadPowerSpectrum(tic_id, **kwargs):
 # =======================================================================
 
 def loadSampleFromHDF5(fname):
+    print(f'Loading {fname}')
     ff = h5py.File(fname, mode="r")
 
     df = {}
