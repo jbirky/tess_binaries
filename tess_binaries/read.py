@@ -10,7 +10,7 @@ from astropy.timeseries import TimeSeries
 
 import tess_binaries as tb
 
-__all__ = ['loadSourceFromFits', 'loadLightCurve', 'loadSampleFromHDF5']     
+__all__ = ['loadSourceFromFits', 'loadLightCurve', 'loadPowerSpectrum', 'loadSampleFromHDF5']     
 
    
 # =======================================================================
@@ -92,8 +92,19 @@ def loadLightCurve(tic_id, **kwargs):
 
 
 def loadPowerSpectrum(tic_id, **kwargs):
+    """
+    Load power spectra from numpy array 
+    """
+    load_dir = kwargs.get('load_dir', tb.ps_dir)
+    ps_type  = kwargs.get('ps_type', 'ls')
+    tic_id = str(tic_id)
     
-    return None
+    try:
+        ps = np.load(f'{load_dir}/{tic_id}_ps_{ps_type}.npy')
+    except:
+        ps = tb.computePowerSpectra(tic_id)
+    
+    return ps
 
 
 # =======================================================================
