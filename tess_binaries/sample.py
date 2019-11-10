@@ -1,3 +1,4 @@
+import pandas as pd
 import multiprocessing as mp
 import time
 
@@ -25,3 +26,5 @@ def sampleComputePowerSpectra(tic_ids):
     t1 = time.time() - t0
     
     print(f'Computed {len(tic_ids)} power spectra: {t1}')
+    
+    return result
