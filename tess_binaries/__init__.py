@@ -1,8 +1,9 @@
+from .core import *
 from .read import *
 from .period import *
 from .plot import *
 from .dtw import *
-from .sample import *
+from .parallel import *
 
 import os
 
