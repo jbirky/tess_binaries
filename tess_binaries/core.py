@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
@@ -16,25 +17,25 @@ __all__ = ['LightCurve', 'PowerSpectrum', 'Sample']
 
 
 class LightCurve():
-	"""
-	Class to store and perform operations on individual light curves
-	"""
-	def __init__(self, *args, **kwargs):
+    """
+    Class to store and perform operations on individual light curves
+    """
+    def __init__(self, *args, **kwargs):
 
-		self.tic_id = kwargs.get('tic_id')			# TESS input catalog ID
+        self.tic_id = kwargs.get('tic_id')          # TESS input catalog ID
         self.type   = kwargs.get('type', None)
 
-		if ('time' in kwargs) and ('flux' in kwargs):
-			self.time 		= kwargs.get('time')		
-			self.flux 		= kwargs.get('flux')		
-			self.flux_err 	= kwargs.get('flux_err')	
+        if ('time' in kwargs) and ('flux' in kwargs):
+            self.time 		= kwargs.get('time')
+            self.flux 		= kwargs.get('flux')
+            self.flux_err 	= kwargs.get('flux_err')
 
-		else:
-			lc = tb.loadLightCurve(self.tic_id)
-			self.time 		= lc[0]					# time in MJD
-			self.flux 		= lc[1]					# PDCSAP flux
-			self.flux_err 	= lc[2]					# PDCSAP flux error
-            
+        else:
+            lc = tb.loadLightCurve(self.tic_id)
+            self.time 		= lc[0]					# time in MJD
+            self.flux 		= lc[1]					# PDCSAP flux
+            self.flux_err 	= lc[2]					# PDCSAP flux error
+
     def powerSpectrum(**kwargs):
         
         method  = kwargs.get('method', 'ls')
@@ -42,19 +43,19 @@ class LightCurve():
         
         return self.ps
 
-	def phaseFold(period):
+    def phaseFold(period):
 
-		self.period = period
+        self.period = period
 
-		lc_t0 = min(self.time)
-		lc_tm = max(self.time)
+        lc_t0 = min(self.time)
+        lc_tm = max(self.time)
 
-		fold_flux = None
+        fold_flux = None
 
-		return fold_flux
-    
+        return fold_flux
+
     def plot(**kwargs):
-    
+
         plt.figure(figsize=[16,8])
         plt.ticklabel_format(useOffset=False)
         if self.type != None:
@@ -75,24 +76,57 @@ class LightCurve():
 
 
 class PowerSpectrum():
-	"""
-	Class to store power spectra and select periods/harmonics
-	"""
-	def __init__(self, *args, **kwargs):
+    """
+    Class to store power spectra and select periods/harmonics
+    """
+    def __init__(self, *args, **kwargs):
 
-		self.tic_id = kwargs.get('tic_id')
+    	self.tic_id = kwargs.get('tic_id')
 
-	def bestPeriod():
-		return None
+    def bestPeriod():
+    	return None
 
-	def returnPeaks():
-		retrun None
+    def returnPeaks():
+    	return None
 
 
 class Sample():
-	"""
-	Class to store light curves of training/test samples
-	"""
-	def __init__(self, *args, **kwargs):
+    """
+    Class to store light curves of training/test samples
+    """
+    def __init__(self, *args, **kwargs):
 
-		self.tic_id = kwargs.get('tic_id')
+    	self.tic_id = kwargs.get('tic_id')
+        
+    def computePeriods(**kwargs):
+        return None
+
+    def preprocess(fold=True, shift=True, scale=True):
+        
+        pharr = np.linspace(0,1,tsteps)
+
+        if fold == True:
+            phase_fold_df = dataframe.fold(period=period*u.day)
+            binned_flux = tb.binData(phase_fold_df, tsteps)
+        else:
+            binned_flux = np.array(dataframe['pdcsap_flux'])
+
+        shift_flux = np.roll(np.array(binned_flux), tsteps-np.argmin(binned_flux))
+
+        if scale == True:
+            scaler = MinMaxScaler()
+            phase_flux_array = np.vstack([pharr, shift_flux]).T
+            scaler.fit(phase_flux_array)
+            scaled_flux = scaler.transform(phase_flux_array).T[1]
+
+            return scaled_flux
+
+        else:
+            return shift_flux
+        
+    def dmatrix(**kwargs):
+        return None
+        
+    def dtw_knn(k=1):
+        
+        k = kwargs.get('k', 1)
