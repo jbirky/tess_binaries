@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from sklearn.preprocessing import MinMaxScaler
 
 import matplotlib.pyplot as plt
@@ -32,41 +33,42 @@ class LightCurve():
 
         else:
             lc = tb.loadLightCurve(self.tic_id)
-            self.time 		= lc[0]					# time in MJD
-            self.flux 		= lc[1]					# PDCSAP flux
-            self.flux_err 	= lc[2]					# PDCSAP flux error
+            self.time 		= np.array(lc[0])					# time in MJD
+            self.flux 		= np.array(lc[1])					# PDCSAP flux
+            self.flux_err 	= np.array(lc[2])					# PDCSAP flux error
 
-    def powerSpectrum(**kwargs):
+    def powerSpectrum(self, **kwargs):
         
         method  = kwargs.get('method', 'ls')
         self.ps = tb.loadPowerSpectrum(self.tic_id)
         
         return self.ps
 
-    def phaseFold(period):
+    def phaseFold(self, period):
 
         self.period = period
 
         lc_t0 = min(self.time)
         lc_tm = max(self.time)
 
-        fold_flux = None
+        phase = self.time/period - np.floor(self.time/period)
+        sort_idx = np.argsort(phase)
 
-        return fold_flux
+        self.phase = phase[sort_idx]
+        self.fold_flux = self.flux[sort_idx]
+        self.fold_flux_err = self.flux_err[sort_idx]
 
-    def plot(**kwargs):
+        return np.vstack([self.phase, self.fold_flux, self.fold_flux_err])
+
+    def plot(self, **kwargs):
 
         plt.figure(figsize=[16,8])
         plt.ticklabel_format(useOffset=False)
-        if self.type != None:
-            plt.plot(self.time, self.flux/np.nanmedian(self.flux), \
-                     color='k', linewidth=.5, label=f'{label}'.replace('_', ' '))
-        else:
-            plt.plot(self.time, self.flux/np.nanmedian(self.flux), color='k', linewidth=.5)
+        plt.plot(self.time, self.flux/np.nanmedian(self.flux), color='k', linewidth=.5)
         plt.ylabel('PDCSAP Flux', fontsize=18)
         plt.xlabel('Julian Date', fontsize=18)
         plt.xlim(min(self.time), max(self.time))
-        plt.legend(loc='upper right', frameon=False, fontsize=16)
+        # plt.legend(loc='upper right', frameon=False, fontsize=16)
         plt.minorticks_on()
 
         if 'save_dir' in kwargs:
