@@ -80,13 +80,16 @@ def loadLightCurve(tic_id, **kwargs):
 
     except:
         print('Loading from FITS files...')
-        data, end_times = loadSourceFromFits(tic_id, load_dir=tb.data_dir)
-        mjd = np.array(data.time.jd)
-        flux = np.array(data['pdcsap_flux'])
-        flux_err = np.array(data['pdcsap_flux_err'])
+        try:
+            data, end_times = loadSourceFromFits(tic_id, load_dir=tb.data_dir)
+            mjd = np.array(data.time.jd)
+            flux = np.array(data['pdcsap_flux'])
+            flux_err = np.array(data['pdcsap_flux_err'])
 
-        lc = np.vstack([mjd, flux, flux_err])
-        np.save(f'{load_dir}/{tic_id}_lc.npy', lc)
+            lc = np.vstack([mjd, flux, flux_err])
+            np.save(f'{load_dir}/{tic_id}_lc.npy', lc)
+        except:
+            print(f'Unable to load source {tic_id}')
 
     return lc
 
