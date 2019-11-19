@@ -11,20 +11,26 @@ from astropy.timeseries import BoxLeastSquares, LombScargle
 
 import tess_binaries as tb
 
-__all__ = ['computePowerSpectra', 'binData']
+__all__ = ['bestPeriod', 'computePowerSpectra', 'binData']
+
+
+def bestPeriod(ps):
+    max_pwr = np.argmax(ps, axis=1)[1]
+    best_period = ps[0][max_pwr]
+
+    return best_period
 
 
 def computePowerSpectra(tic_id, **kwargs):
     
     load_dir = kwargs.get('load_dir', tb.ps_dir)
-    methods  = kwargs.get('methods', ['ls'])
+    method  = kwargs.get('method', 'ls')
 
     mjd, flux, flux_err = tb.loadLightCurve(tic_id)
     data = pd.DataFrame(data={'time':mjd, 'flux':flux, 'flux_err':flux_err})
     ts = data[~np.isnan(data['flux'])]
     
-    power_spectra = []
-    if 'ls' or 'bls' in methods:
+    if method == 'ls':
         # Compute lomb-scargle power series
         ls0 = time.time()
         ls =  LombScargle(ts['time'] * u.day, ts['flux'], dy=ts['flux_err'], \
@@ -35,19 +41,16 @@ def computePowerSpectra(tic_id, **kwargs):
 
         ls_pwr_spec  = np.vstack([np.array(1/ls_freq), np.array(ls_power)])
         print(f'Lomb-Scargle compute time: {ls_time}')
-        
-        # Find best lomb-scargle period
-        ls_max_pwr = np.argmax(ls_pwr_spec, axis=1)[1]
-        ls_best_period = ls_pwr_spec[0][ls_max_pwr]
 
         # Save power spectrum to numpy file
         ls_fname = f'{load_dir}/{tic_id}_ps_ls.npy'
         print(f'Saving power spectra to {ls_fname}.')
         np.save(ls_fname, ls_pwr_spec)
 
-        power_spectra.append(ls_pwr_spec)
+        power_spectra = ls_pwr_spec
     
-    if 'bls' in methods: # NOT WORKING
+    ### NOT WORKING ###
+    elif method == 'bls': 
         # Compute box-least-squares power series
         bls0 = time.time()
         psamp = 10**3
@@ -60,16 +63,12 @@ def computePowerSpectra(tic_id, **kwargs):
         bls_pwr_spec = np.vstack([np.array(periodogram.period), np.array(periodogram.power)])
         print(f'Box-Least-Squares compute time: {bls_time}')
 
-        #find best BLS period
-        bls_max_pwr = np.argmax(bls_pwr_spec, axis=1)[1]
-        bls_best_period = bls_pwr_spec[0][bls_max_pwr]
-
         # Save power spectrum to numpy file
         bls_fname = f'{load_dir}/{tic_id}_ps_bls.npy'
         print(f'Saving power spectra to {bls_fname}.')
         np.save(bls_fname, bls_pwr_spec)
 
-        power_spectra.append(bls_pwr_spec)
+        power_spectra = bls_pwr_spec
     
     return power_spectra
 

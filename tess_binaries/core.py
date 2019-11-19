@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import math
 from sklearn.preprocessing import MinMaxScaler
 
@@ -36,40 +37,89 @@ class LightCurve():
             self.time 		= np.array(lc[0])					# time in MJD
             self.flux 		= np.array(lc[1])					# PDCSAP flux
             self.flux_err 	= np.array(lc[2])					# PDCSAP flux error
+            self.norm_flux  = self.flux/np.nanmedian(self.flux)
 
-    def powerSpectrum(self, **kwargs):
+    def powerSpectrum(self, method='ls'):
         
-        method  = kwargs.get('method', 'ls')
-        self.ps = tb.loadPowerSpectrum(self.tic_id)
+        self.ps = tb.loadPowerSpectrum(self.tic_id, ps_type=method)
+        self.best_period = tb.bestPeriod(self.ps)
         
-        return self.ps
+        return self.ps, self.best_period
 
-    def phaseFold(self, period):
+    def phaseFold(self, **kwargs):
 
-        self.period = period
+        self.period = kwargs.get('period', self.best_period)
 
         lc_t0 = min(self.time)
         lc_tm = max(self.time)
 
-        phase = self.time/period - np.floor(self.time/period)
+        phase = self.time/self.period - np.floor(self.time/self.period)
         sort_idx = np.argsort(phase)
 
         self.phase = phase[sort_idx]
-        self.fold_flux = self.flux[sort_idx]
-        self.fold_flux_err = self.flux_err[sort_idx]
+        self.phase_flux = self.flux[sort_idx]
+        self.phase_flux_err = self.flux_err[sort_idx]
+        self.norm_phase_flux = self.norm_flux[sort_idx]
 
-        return np.vstack([self.phase, self.fold_flux, self.fold_flux_err])
+        return np.vstack([self.phase, self.phase_flux, self.phase_flux_err])
+
+    def smoothData(self, method='rolling_median', window=20):
+
+        bin_flux = []
+        if method == 'rolling_median':
+            for i in range(len(self.phase_flux)):
+                bin_flux.append(np.nanmedian(self.norm_phase_flux[i-window:i+window]))
+            # self.bin_flux = pd.Series(self.norm_phase_flux, center=True).rolling(window).median()
+        self.bin_flux = np.array(bin_flux)
+
+        return self.bin_flux
 
     def plot(self, **kwargs):
 
-        plt.figure(figsize=[16,8])
-        plt.ticklabel_format(useOffset=False)
-        plt.plot(self.time, self.flux/np.nanmedian(self.flux), color='k', linewidth=.5)
-        plt.ylabel('PDCSAP Flux', fontsize=18)
-        plt.xlabel('Julian Date', fontsize=18)
-        plt.xlim(min(self.time), max(self.time))
-        # plt.legend(loc='upper right', frameon=False, fontsize=16)
-        plt.minorticks_on()
+        opt = kwargs.get('opt') 
+
+        if opt == 'phase':
+            plt.figure(figsize=[16,8])
+            plt.ticklabel_format(useOffset=False)
+            plt.scatter(self.phase, self.norm_phase_flux, color='k', s=1)
+            plt.ylabel('PDCSAP Flux', fontsize=18)
+            plt.xlabel('Julian Date', fontsize=18)
+            plt.xlim(min(self.phase), max(self.phase))
+            plt.minorticks_on()
+
+        elif opt == 'smooth':
+            plt.figure(figsize=[16,8])
+            plt.ticklabel_format(useOffset=False)
+            plt.scatter(self.phase, self.norm_phase_flux, color='k', s=1)
+            plt.plot(self.phase, self.bin_flux, color='r')
+            plt.ylabel('PDCSAP Flux', fontsize=18)
+            plt.xlabel('Julian Date', fontsize=18)
+            plt.xlim(min(self.phase), max(self.phase))
+            plt.minorticks_on()
+
+        elif opt == 'ps':
+            plt.figure(figsize=[16,8])
+            plt.ticklabel_format(useOffset=False)
+            plt.axvline(self.best_period, color='r', linewidth=.5, alpha=.6, \
+                label=f'Period: {round(self.best_period,3)}')
+            plt.plot(self.ps[0], self.ps[1], color='k', linewidth=1)
+            plt.ylabel('Power [normalized]', fontsize=18)
+            plt.xlabel('Period [days]', fontsize=18)
+            plt.xlim(min(self.ps[0]), max(self.ps[0]))
+            plt.ylim(0,1)
+            plt.legend(loc='upper right', frameon=False, fontsize=16)
+            plt.minorticks_on()
+            plt.xscale('log')
+
+        else:
+            plt.figure(figsize=[16,8])
+            plt.ticklabel_format(useOffset=False)
+            plt.plot(self.time, self.flux/np.nanmedian(self.flux), color='k', linewidth=.5)
+            plt.ylabel('PDCSAP Flux', fontsize=18)
+            plt.xlabel('Julian Date', fontsize=18)
+            plt.xlim(min(self.time), max(self.time))
+            # plt.legend(loc='upper right', frameon=False, fontsize=16)
+            plt.minorticks_on()
 
         if 'save_dir' in kwargs:
             save_dir = kwargs.get('save_dir')
