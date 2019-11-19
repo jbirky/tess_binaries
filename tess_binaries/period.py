@@ -11,7 +11,7 @@ from astropy.timeseries import BoxLeastSquares, LombScargle
 
 import tess_binaries as tb
 
-__all__ = ['bestPeriod', 'computePowerSpectra', 'binData']
+__all__ = ['bestPeriod', 'computePowerSpectra', 'binData', 'phaseDispersionMinimization']
 
 
 def bestPeriod(ps):
@@ -84,6 +84,20 @@ def binData(data, tsteps):
     bin_flux = np.array(bin_flux)/np.nanmedian(np.array(bin_flux))
     
     return bin_flux
+
+
+def phaseDispersionMinimization(lc, window=100, **kwargs):
+    
+    periods = kwargs.get('periods')
+
+    chi_vals = []
+    for per in periods:
+        lc.phaseFold(period=per)
+        lc.smoothData(window=window)
+
+        chi_vals.append(np.nansum(((lc.phase_flux - lc.bin_flux)/lc.phase_flux_err)**2))
+    
+    return chi_vals
 
 
 # =======================================================================

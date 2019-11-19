@@ -68,9 +68,9 @@ class LightCurve():
         bin_flux = []
         if method == 'rolling_median':
             for i in range(len(self.phase_flux)):
-                bin_flux.append(np.nanmedian(self.norm_phase_flux[i-window:i+window]))
-            # self.bin_flux = pd.Series(self.norm_phase_flux, center=True).rolling(window).median()
+                bin_flux.append(np.nanmedian(self.phase_flux[i-window:i+window]))
         self.bin_flux = np.array(bin_flux)
+        self.norm_bin_flux = self.bin_flux/np.nanmedian(self.bin_flux)
 
         return self.bin_flux
 
@@ -91,7 +91,7 @@ class LightCurve():
             plt.figure(figsize=[16,8])
             plt.ticklabel_format(useOffset=False)
             plt.scatter(self.phase, self.norm_phase_flux, color='k', s=1)
-            plt.plot(self.phase, self.bin_flux, color='r')
+            plt.plot(self.phase, self.norm_bin_flux, color='r')
             plt.ylabel('PDCSAP Flux', fontsize=18)
             plt.xlabel('Julian Date', fontsize=18)
             plt.xlim(min(self.phase), max(self.phase))
@@ -121,6 +121,8 @@ class LightCurve():
             # plt.legend(loc='upper right', frameon=False, fontsize=16)
             plt.minorticks_on()
 
+        if 'title' in kwargs:
+            plt.title(kwargs.get('title'), fontsize=20)
         if 'save_dir' in kwargs:
             save_dir = kwargs.get('save_dir')
             plt.savefig(f'{save_dir}/TIC_{self.tic_id}.png')
