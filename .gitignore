@@ -2,5 +2,5 @@ catalogs/
 results/
 */.ipynb_checkpoints
 *.txt
-*.png
 */__pycache__
+notebooks/*.png
