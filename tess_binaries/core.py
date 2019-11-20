@@ -81,23 +81,14 @@ class LightCurve():
 
         opt = kwargs.get('opt') 
 
-        if opt == 'phase':
+        if opt == 'lc':
             plt.figure(figsize=[16,8])
             plt.ticklabel_format(useOffset=False)
-            plt.scatter(self.phase, self.norm_phase_flux, color='k', s=1)
+            plt.plot(self.time, self.flux/np.nanmedian(self.flux), color='k', linewidth=.5)
             plt.ylabel('PDCSAP Flux', fontsize=18)
             plt.xlabel('Julian Date', fontsize=18)
-            plt.xlim(min(self.phase), max(self.phase))
-            plt.minorticks_on()
-
-        elif opt == 'smooth':
-            plt.figure(figsize=[16,8])
-            plt.ticklabel_format(useOffset=False)
-            plt.scatter(self.phase, self.norm_phase_flux, color='k', s=1)
-            plt.plot(self.phase, self.norm_bin_flux, color='r')
-            plt.ylabel('PDCSAP Flux', fontsize=18)
-            plt.xlabel('Julian Date', fontsize=18)
-            plt.xlim(min(self.phase), max(self.phase))
+            plt.xlim(min(self.time), max(self.time))
+            # plt.legend(loc='upper right', frameon=False, fontsize=16)
             plt.minorticks_on()
 
         elif opt == 'ps':
@@ -114,21 +105,30 @@ class LightCurve():
             plt.minorticks_on()
             plt.xscale('log')
 
-        elif opt == 'lc':
+        elif opt == 'phase':
             plt.figure(figsize=[16,8])
             plt.ticklabel_format(useOffset=False)
-            plt.plot(self.time, self.flux/np.nanmedian(self.flux), color='k', linewidth=.5)
+            plt.scatter(self.phase, self.norm_phase_flux, color='k', s=1)
             plt.ylabel('PDCSAP Flux', fontsize=18)
-            plt.xlabel('Julian Date', fontsize=18)
-            plt.xlim(min(self.time), max(self.time))
-            # plt.legend(loc='upper right', frameon=False, fontsize=16)
+            plt.xlabel('Phase', fontsize=18)
+            plt.xlim(min(self.phase), max(self.phase))
             plt.minorticks_on()
 
+        elif opt == 'smooth':
+            plt.figure(figsize=[16,8])
+            plt.ticklabel_format(useOffset=False)
+            plt.scatter(self.phase, self.norm_phase_flux, color='k', s=1)
+            plt.plot(self.phase, self.norm_bin_flux, color='r')
+            plt.ylabel('PDCSAP Flux', fontsize=18)
+            plt.xlabel('Phase', fontsize=18)
+            plt.xlim(min(self.phase), max(self.phase))
+            plt.minorticks_on()
+        
         if 'title' in kwargs:
             plt.title(kwargs.get('title'), fontsize=20)
         if 'save_dir' in kwargs:
             save_dir = kwargs.get('save_dir')
-            plt.savefig(f'{save_dir}/TIC_{self.tic_id}.png')
+            plt.savefig(save_dir)
         plt.show() 
 
 

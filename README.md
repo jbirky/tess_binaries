@@ -37,6 +37,15 @@ pdm_period = tb.pdm(lc, p0=lc.best_period, factors=[1,2,4], bound=.1, window=100
 lc.smoothData(window=100)
 lc.plot(opt='smooth')
 ```
+Output:
+```
+TIC ID:                                117544915
+p0 period (days):             1.4808269575451964
+PDM period (days):            2.9685313344670723
+Chi^2:                        126270.48472405349
+Iterations:                                   49
+Compute time (s):              73.12620449066162
+```
 ![](docs/117544915_pdm_phase.png)
 
 #### Parallelized functions (for N objects):
