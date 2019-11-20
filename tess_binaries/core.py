@@ -39,6 +39,8 @@ class LightCurve():
             self.flux_err 	= np.array(lc[2])					# PDCSAP flux error
             self.norm_flux  = self.flux/np.nanmedian(self.flux)
 
+        self.baseline = max(self.time) - min(self.time)
+
     def powerSpectrum(self, method='ls'):
         
         self.ps = tb.loadPowerSpectrum(self.tic_id, ps_type=method)
@@ -63,12 +65,13 @@ class LightCurve():
 
         return np.vstack([self.phase, self.phase_flux, self.phase_flux_err])
 
-    def smoothData(self, method='rolling_median', window=20):
+    def smoothData(self, method='rolling_median', window=128):
 
         bin_flux = []
         if method == 'rolling_median':
             for i in range(len(self.phase_flux)):
                 bin_flux.append(np.nanmedian(self.phase_flux[i-window:i+window]))
+            # self.bin_flux = pd.Series(self.norm_phase_flux, center=True).rolling(window).median()
         self.bin_flux = np.array(bin_flux)
         self.norm_bin_flux = self.bin_flux/np.nanmedian(self.bin_flux)
 
@@ -111,7 +114,7 @@ class LightCurve():
             plt.minorticks_on()
             plt.xscale('log')
 
-        else:
+        elif opt == 'lc':
             plt.figure(figsize=[16,8])
             plt.ticklabel_format(useOffset=False)
             plt.plot(self.time, self.flux/np.nanmedian(self.flux), color='k', linewidth=.5)

@@ -116,16 +116,18 @@ def loadPowerSpectrum(tic_id, **kwargs):
 
 def loadSampleFromHDF5(fname):
     print(f'Loading {fname}')
-    ff = h5py.File(fname, mode="r")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")            
+        ff = h5py.File(fname, mode="r")
 
-    df = {}
-    for key in list(ff):
-        try:
-            df[key] = ff[key].value
-        except:
-            df[key] = np.array(ff[key].value, dtype='str')
+        df = {}
+        for key in list(ff):
+            try:
+                df[key] = ff[key].value
+            except:
+                df[key] = np.array(ff[key].value, dtype='str')
 
-    ff.close()
-    sample = pd.DataFrame(data=df)
-    
+        ff.close()
+        sample = pd.DataFrame(data=df)
+        
     return sample

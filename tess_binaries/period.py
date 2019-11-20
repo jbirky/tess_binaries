@@ -9,9 +9,11 @@ import pickle
 from astropy import units as u
 from astropy.timeseries import BoxLeastSquares, LombScargle
 
+from scipy.optimize import minimize_scalar
+
 import tess_binaries as tb
 
-__all__ = ['bestPeriod', 'computePowerSpectra', 'binData', 'phaseDispersionMinimization']
+__all__ = ['bestPeriod', 'computePowerSpectra', 'binData', 'phaseDispersion', 'pdm']
 
 
 def bestPeriod(ps):
@@ -86,18 +88,53 @@ def binData(data, tsteps):
     return bin_flux
 
 
-def phaseDispersionMinimization(lc, window=100, **kwargs):
-    
-    periods = kwargs.get('periods')
+def phaseDispersion(period, *args):
 
-    chi_vals = []
-    for per in periods:
-        lc.phaseFold(period=per)
-        lc.smoothData(window=window)
+    lc, window = args
+    lc.phaseFold(period=period)
+    lc.smoothData(window=window)
 
-        chi_vals.append(np.nansum(((lc.phase_flux - lc.bin_flux)/lc.phase_flux_err)**2))
-    
-    return chi_vals
+    chi_val = np.nansum(((lc.phase_flux - lc.bin_flux)/lc.phase_flux_err)**2)
+
+    return chi_val
+
+
+def pdm(lc, **kwargs):
+
+    p0     = kwargs.get('p0', lc.best_period)
+    bound  = kwargs.get('bound', .1)
+    window = kwargs.get('window', 200)
+    rng = bound*p0
+
+    factors = kwargs.get('factors', [1,2,4])
+
+    try:
+        t0 = time.time()
+        pdm_periods, pdm_chivals = [], []
+        nevals = 0
+        for f in factors:
+            mult_period = f*p0
+            if mult_period < lc.baseline/2:
+                p = minimize_scalar(phaseDispersion, bounds=(mult_period-rng, mult_period+rng), \
+                                    method='bounded', args=(lc, window))
+                pdm_periods.append(p.x)
+                pdm_chivals.append(p.fun)
+                nevals += p.nfev
+        best_ind = np.argmin(pdm_chivals)
+        pdm_best_period = np.array(pdm_periods)[best_ind]
+        pdm_best_chival = np.array(pdm_chivals)[best_ind]
+
+        print("\n{0:<24}{1:>24}".format('TIC ID:', lc.tic_id))
+        print("{0:<24}{1:>24}".format('p0 period (days):', p0))
+        print("{0:<24}{1:>24}".format('PDM period (days):', pdm_best_period))
+        print("{0:<24}{1:>24}".format('Chi^2:', pdm_best_chival))
+        print("{0:<24}{1:>24}".format('Iterations:', nevals))
+        print("{0:<24}{1:>24}".format('Compute time (s):', time.time() - t0))
+
+        return pdm_best_period
+
+    except:
+        return np.nan
 
 
 # =======================================================================
