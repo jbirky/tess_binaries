@@ -64,3 +64,57 @@ def plotDTW(flux1, flux2, **kwargs):
     plt.legend(loc='lower right', fontsize=16)
     plt.ticklabel_format(useOffset=False)
     plt.show()
+
+
+def plotConfusionMatrix(cmatrix, tnames, **kwargs):
+    
+    k = kwargs.get('k', 'k')
+    show_percent = kwargs.get('percent', False)
+    nlabel = len(tnames)
+
+    fig, ax = plt.subplots(figsize=[12,12])
+    if show_percent == True:
+        cmatrix = np.round(cmatrix/np.sum(cmatrix, axis=0), 2)
+    
+    im = ax.matshow(cmatrix, cmap='Blues', norm=colors.PowerNorm(gamma=0.6))
+
+    ax.set_xticks(np.arange(nlabel))
+    ax.set_yticks(np.arange(nlabel))
+    ax.set_xticklabels(tnames)
+    ax.set_yticklabels(tnames)
+
+    ax.xaxis.set_ticks_position('bottom')
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+
+    for i in range(nlabel):
+        for j in range(nlabel):
+            val = cmatrix[i, j]
+            if val > .65*(np.max(cmatrix) - np.min(cmatrix)):
+                text = ax.text(j, i, val, ha="center", va="center", color="w")
+            else:
+                text = ax.text(j, i, val, ha="center", va="center", color="k")
+
+    ax.set_title(f"{k}-NN Confusion Matrix", fontsize=25)
+    ax.set_xlabel('Reference Label', fontsize=20)
+    ax.set_ylabel(f'{k}-NN Label', fontsize=20)
+    fig.tight_layout()
+    if 'save_dir' in kwargs:
+        plt.savefig(kwargs.get('save_dir'))
+    
+    return fig
+    
+
+def returnKNN(dmatrix, k):
+    
+    nn1 = []
+    for i in range(len(dmatrix)):
+        min_dist = sorted(dmatrix[i])[1:k+1]
+        min_dist_ind = np.array([np.where(dmatrix[i] == d)[0][0] for d in min_dist])
+        votes = np.array(subsamp['type'])[min_dist_ind]
+        best = Counter(votes).most_common(1)[0][0]
+        nn1.append(best)
+
+    train = list(subsamp['type'])
+    test = nn1
+    
+    return confusion_matrix(test, train, labels=tnames)
