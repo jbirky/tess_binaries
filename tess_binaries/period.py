@@ -75,17 +75,16 @@ def computePowerSpectra(tic_id, **kwargs):
     return power_spectra
 
 
-def binData(data, tsteps):
+def binData(lc, tsteps=100):
     
-    tbins = np.linspace(min(data.time.jd), max(data.time.jd), tsteps+1)
+    tbins = np.linspace(min(lc.phase), max(lc.phase), tsteps+1)
     bin_width = (tbins[1] - tbins[0])/2
     bin_flux = []
     for i in range(tsteps):
-        bin_ind = np.where((data.time.jd > tbins[i]) & (data.time.jd < tbins[i+1]))[0]
-        bin_flux.append(np.nanmedian(data['pdcsap_flux'][bin_ind])/u.electron*u.second)
-    bin_flux = np.array(bin_flux)/np.nanmedian(np.array(bin_flux))
+        bin_ind = np.where((lc.phase > tbins[i]) & (lc.phase < tbins[i+1]))[0]
+        bin_flux.append(np.nanmedian(lc.norm_bin_flux[bin_ind]))
     
-    return bin_flux
+    return np.array(bin_flux)
 
 
 def phaseDispersion(period, *args):
@@ -134,7 +133,7 @@ def pdm(lc, **kwargs):
         return pdm_best_period
 
     except:
-        return np.nan
+        return 0
 
 
 # =======================================================================
@@ -171,3 +170,16 @@ def _computePowerSpectra(tic_id, **kwargs):
     pickle.dump(ps_output, output)
     
     return ps_output
+
+
+def _binData(data, tsteps):
+    
+    tbins = np.linspace(min(data.time.jd), max(data.time.jd), tsteps+1)
+    bin_width = (tbins[1] - tbins[0])/2
+    bin_flux = []
+    for i in range(tsteps):
+        bin_ind = np.where((data.time.jd > tbins[i]) & (data.time.jd < tbins[i+1]))[0]
+        bin_flux.append(np.nanmedian(data['pdcsap_flux'][bin_ind])/u.electron*u.second)
+    bin_flux = np.array(bin_flux)/np.nanmedian(np.array(bin_flux))
+    
+    return bin_flux
